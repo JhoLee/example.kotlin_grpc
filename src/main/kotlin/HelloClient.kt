@@ -10,11 +10,18 @@ fun main(args: Array<String>) {
         .usePlaintext()
         .build()
 
-    val stub = HelloServiceGrpc.newBlockingStub(channel)
-    val response = stub.sayHello(getHelloRequest("hello from client", "Jho"))
+    val sampleRequest = getHelloRequest("Hello from client", "Jho")
 
-    println("[client] response(${response.reply})")
+    val stub = HelloServiceGrpc.newBlockingStub(channel)
+    val responseSayHello = stub.sayHello(sampleRequest)
+    val responseLotsOfReplies = stub.lotsOfReplies(sampleRequest)
+
+    println("[client] responseSayHello(reply: ${responseSayHello.reply}, name: ${responseSayHello.name})")
+    responseLotsOfReplies.forEach {
+        println("[client] responseLotsOfReplies(reply: ${it.reply}, name: ${it.name}")
+    }
 }
+
 
 fun getHelloRequest(greeting: String, name: String): Hello.HelloRequest {
     return Hello.HelloRequest.newBuilder()

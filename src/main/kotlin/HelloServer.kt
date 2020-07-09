@@ -2,6 +2,7 @@ package ai.si_analytics
 
 import io.grpc.ServerBuilder
 import io.grpc.stub.StreamObserver
+import java.lang.Thread.sleep
 
 fun main(args: Array<String>) {
 
@@ -12,9 +13,10 @@ fun main(args: Array<String>) {
         .addService(service)
         .build()
 
-    println("[server] server starts()")
+    println("[server] server starts")
     server.start()
     server.awaitTermination()
+    println("[server] started.")
 }
 
 class HelloService : HelloServiceGrpc.HelloServiceImplBase() {
@@ -30,7 +32,17 @@ class HelloService : HelloServiceGrpc.HelloServiceImplBase() {
     }
 
     override fun lotsOfReplies(request: Hello.HelloRequest?, responseObserver: StreamObserver<Hello.HelloResponse>?) {
-        println("[server] lotsOfReplies()")
+        println("[server] lotsOfReplies(${request?.greeting}, ${request?.name})")
+
+        for (i in 1..4) {
+            val response = Hello.HelloResponse.newBuilder()
+                .setReply("Hello - $i")
+                .setName("${request?.name}")
+                .build()
+            responseObserver?.onNext(response)
+            sleep(1000)
+        }
+        responseObserver?.onCompleted()
     }
 
     override fun lotsOfGreetings(responseObserver: StreamObserver<Hello.HelloResponse>?): StreamObserver<Hello.HelloRequest> {
